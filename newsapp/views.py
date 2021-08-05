@@ -29,6 +29,14 @@ class ListTopPosts(APIView):
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
+
+class MostViewedPosts(APIView):
+    def get(self, request):
+        posts = Post.objects.all().order_by('-views')[:6]
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+
 class DetailPost(APIView):
     def get_object(self, pk):
         try:
@@ -39,6 +47,8 @@ class DetailPost(APIView):
     def get(self, request, pk, format=None):
         post = self.get_object(pk)
         serializer = PostSerializer(post)
+        post.views=post.views+1
+        post.save()
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
