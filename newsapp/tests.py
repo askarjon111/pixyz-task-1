@@ -1,29 +1,28 @@
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, RequestFactory
+from django.utils import timezone
+from django.urls import reverse
+from django.contrib.auth.models import User
+
 
 from .views import *
 
 
 class ListPostsTestCase(TestCase):
-    longMessage = True
-    def test_get(self):
-        status_code = 200
-        view_class = ListPosts
-        
-        req = RequestFactory().get('/')
-        req.user = AnonymousUser()
-        resp = ListPosts.as_view()(req, *[], **{})
-        self.assertEqual(resp.status_code, 200)
+    def create_post(self, title="title", body="body"):
+        user = User.objects.create(username='testuser', is_superuser=True)
+        return Post.objects.create(title=title, body=body, created_at=timezone.now(), author=user)
 
+    def test_post_creation(self):
+        post = self.create_post()
+        self.assertTrue(isinstance(post, Post))
+        self.assertEqual(post.__str__(), post.title)
 
-class DetailPostTestCase(TestCase):
-    longMessage = True
-    def test_get(self):
-        status_code = 200
-        view_class = DetailPost.as_view()
-        
-        req = RequestFactory().get(obj.pk)
-        req.user = AnonymousUser()
-        resp = DetailPost.as_view()(req, *[], **{})
+    def post_list_view(self):
+        post = self.create_post()
+        url = reverse("newsapp.views.ListPosts")
+        resp = self.client.get(url)
+
         self.assertEqual(resp.status_code, 200)
+        self.assertIn(post.title, resp.content)
