@@ -10,7 +10,7 @@ from .serializers import *
 
 
 class ListPosts(APIView):  
-    def get(self, request,):
+    def get(self, request):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
@@ -21,6 +21,34 @@ class ListPosts(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DetailPost(APIView):
+    def get_object(self, pk):
+        try:
+            return Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        post = self.get_object(pk)
+        serializer = PostSerializer(post)
+        post.views = post.views+1
+        post.save()
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        post = self.get_object(pk)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        post = self.get_object(pk)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ListTopPosts(APIView):
@@ -37,29 +65,28 @@ class MostViewedPosts(APIView):
         return Response(serializer.data)
 
 
-class DetailPost(APIView):
-    def get_object(self, pk):
-        try:
-            return Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            raise Http404
-    
-    def get(self, request, pk, format=None):
-        post = self.get_object(pk)
-        serializer = PostSerializer(post)
-        post.views=post.views+1
-        post.save()
+class ListCategories(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        post = self.get_object(pk)
-        serializer = PostSerializer(post, data=request.data)
+    def post(self, request, format=None):
+        serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
-        post = self.get_object(pk)
-        post.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class DetailCategory(APIView):
+    def get_object(self, pk):
+        try:
+            return Category.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        posts = Post.objects.filter(category=pk).order_by('-id')
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
