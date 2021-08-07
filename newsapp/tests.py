@@ -41,7 +41,7 @@ class GETNewsTest(TestCase):
         response = client.get(
             reverse('postdetail', kwargs={'pk': 30}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-   
+
 
 class POSTNewsTest(TestCase):
     def setUp(self):
@@ -56,7 +56,6 @@ class POSTNewsTest(TestCase):
             'body': 'Test',
             'author': 1,
         }
-        
 
     def test_create_valid_post(self):
         response = client.post(
@@ -111,7 +110,6 @@ class PUTDeleteNewsTest(TestCase):
             content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    
     # Delete test
 
     def test_valid_delete_post(self):

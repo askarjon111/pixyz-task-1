@@ -9,12 +9,12 @@ from .models import *
 from .serializers import *
 
 
-class ListPosts(APIView):  
+class ListPosts(APIView):
     def get(self, request):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request, format=None):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
