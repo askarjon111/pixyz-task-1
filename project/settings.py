@@ -6,9 +6,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-0!#&+v@nu=4+7ny5ij=$pyjai2mz3bu49c8&m^lk*f7sfptp%o'
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['588531-co44356.tmweb.ru']
+
 
 
 INSTALLED_APPS = [
@@ -54,8 +55,12 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'newsapp',
+        'USER': 'askar',
+        'PASSWORD': 'salom123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
