@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth.models import User
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -8,13 +9,14 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['title', 'body', 'category', 'author']
         extra_kwargs = {'author': {'read_only': True}}
 
-    # def create(self, validated_data):
-    #     authenticated_user = self.context['request'].user
-    #     post = Post.objects.create(**validated_data, user=authenticated_user)
-    #     return post
-
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email']

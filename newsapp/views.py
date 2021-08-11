@@ -7,6 +7,8 @@ from rest_framework import status
 
 from .models import *
 from .serializers import *
+from drf_yasg.utils import swagger_auto_schema
+from django.shortcuts import get_object_or_404
 
 
 class ListPosts(APIView):
@@ -15,6 +17,7 @@ class ListPosts(APIView):
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=PostSerializer)
     def post(self, request, format=None):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
@@ -38,6 +41,7 @@ class DetailPost(APIView):
         post.save()
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=PostSerializer)
     def put(self, request, pk, format=None):
         post = self.get_object(pk)
         serializer = PostSerializer(post, data=request.data)
@@ -72,6 +76,8 @@ class ListCategories(APIView):
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
 
+
+    @swagger_auto_schema(request_body=CategorySerializer)
     def post(self, request, format=None):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
@@ -91,3 +97,44 @@ class DetailCategory(APIView):
         posts = Post.objects.filter(category=pk).order_by('-id')
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
+
+
+class ListUsers(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=UserSerializer)
+    def post(self, request, format=None):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DetailUser(APIView):
+    def get_object(self, pk):
+        try:
+            return User.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        users = User.objects.filter(user=pk).order_by('-id')
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=UserSerializer)
+    def put(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = UserSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        user = self.get_object(pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
