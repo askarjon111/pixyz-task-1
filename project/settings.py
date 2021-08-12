@@ -105,5 +105,5 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SWAGGER_SETTINGS = {
-    'VALIDATOR_URL': 'http://localhost:8189',
+    'VALIDATOR_URL': 'http://588531-co44356.tmweb.ru/',
 }
